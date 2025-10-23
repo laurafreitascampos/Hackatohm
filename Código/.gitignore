@@ -1,0 +1,14 @@
+# Ambiente Virtual Python
+.venv/
+venv/
+
+# Arquivos de cache do Python
+__pycache__/
+*.pyc
+
+# Arquivos de IDE (VS Code)
+.vscode/
+
+# Arquivos de segredos (NUNCA envie chaves de API!)
+.env
+secrets.toml
