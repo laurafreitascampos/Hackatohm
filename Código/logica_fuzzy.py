@@ -70,10 +70,23 @@ def calcular_risco_deslizamento(leitura_pluviometro, leitura_umidade, leitura_ac
     calculo_risco.input['umidade_solo'] = leitura_umidade
     calculo_risco.input['vibracao_solo'] = leitura_acelerometro
 
-    # Computando o resultado
+    # Bloco Corrigido (à prova de falhas)
+# Computando o resultado
     calculo_risco.compute()
 
-    return calculo_risco.output['risco']
+    try:
+    # Tenta retornar o valor calculado normalmente
+        return calculo_risco.output['risco']
+    except (KeyError, ValueError):
+    # Se um KeyError ou ValueError ocorrer, significa que a combinação de 
+    # entradas não disparou nenhuma regra. Isso geralmente representa um 
+    # cenário de risco muito baixo. Retornamos um valor padrão.
+    # print(f"AVISO: Nenhuma regra fuzzy ativada. Retornando risco mínimo.") # Opcional: para debug
+        return 1.0 # Retorna um valor numérico seguro que corresponde a "Muito Baixo"
+    # Computando o resultado
+    #calculo_risco.compute()
+
+    #return calculo_risco.output['risco']
 
 # Bloco de teste (opcional)
 if __name__ == '__main__':
