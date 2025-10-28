@@ -88,8 +88,8 @@ def processar_dados_regiao(nome_regiao):
     return pd.DataFrame(lista_resultados)
 
 # --- INTERFACE DO DASHBOARD ---
-st.title("🔥 Plataforma Interativa de Riscos para Bombeiros Militares")
-st.markdown("Dashboard para monitoramento de riscos de deslizamento em Minas Gerais, baseado em dados de sensores e lógica fuzzy.")
+st.title("🔥 Plataforma Interativa de Riscos - CBMMG")
+st.markdown("Alertas de risco de deslizamento em Minas Gerais")
 
 # --- SIDEBAR COM NOVOS FILTROS ---
 st.sidebar.header("Filtros de Visualização")
