@@ -7,7 +7,7 @@ from logica_fuzzy import calcular_risco_deslizamento
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
     page_title="Plataforma de Riscos - CBMMG",
-    page_icon="🔥",
+    page_icon="🚨",
     layout="wide"
 )
 
@@ -88,7 +88,7 @@ def processar_dados_regiao(nome_regiao):
     return pd.DataFrame(lista_resultados)
 
 # --- INTERFACE DO DASHBOARD ---
-st.title("🔥 Plataforma Interativa de Riscos - CBMMG")
+st.title("🚨 Plataforma Interativa de Riscos - CBMMG")
 st.markdown("Alertas de risco de deslizamento em Minas Gerais")
 
 # --- SIDEBAR COM NOVOS FILTROS ---
