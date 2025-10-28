@@ -12,7 +12,6 @@ st.set_page_config(
 )
 
 # --- DADOS DE GEOLOCALIZAÇÃO (SIMULADO) ---
-# Em um projeto real, isso viria de um banco de dados ou API de geocodificação.
 COORDENADAS_CIDADES = {
     "Belo Horizonte": {"lat": -19.9245, "lon": -43.9352},
     "Sete Lagoas": {"lat": -19.4665, "lon": -44.2466},
@@ -89,63 +88,81 @@ def processar_dados_regiao(nome_regiao):
     return pd.DataFrame(lista_resultados)
 
 # --- INTERFACE DO DASHBOARD ---
-
-# Título
 st.title("🔥 Plataforma Interativa de Riscos para Bombeiros Militares")
 st.markdown("Dashboard para monitoramento de riscos de deslizamento em Minas Gerais, baseado em dados de sensores e lógica fuzzy.")
 
-# Sidebar para filtros
+# --- SIDEBAR COM NOVOS FILTROS ---
 st.sidebar.header("Filtros de Visualização")
 
-# Seleção de Região
-# Mapeia a chave interna para um nome mais amigável
-nomes_regioes = {
-    "regiao_central": "Região Central",
-    "triangulo_mineiro": "Triângulo Mineiro",
-    "zona_da_mata": "Zona da Mata",
-    "norte_de_minas": "Norte de Minas",
-    "leste_de_minas": "Leste de Minas",
-    "sul_de_minas": "Sul de Minas"
+# Seleção de Região - Simplificada
+regioes = {
+    "Região Central": "regiao_central",
+    "Triângulo Mineiro": "triangulo_mineiro", 
+    "Zona da Mata": "zona_da_mata",
+    "Norte de Minas": "norte_de_minas",
+    "Leste de Minas": "leste_de_minas",
+    "Sul de Minas": "sul_de_minas"
 }
-regiao_selecionada_nome = st.sidebar.selectbox(
-    "Selecione a Região Operacional:",
-    options=list(nomes_regioes.values()),
-    index=0 # Inicia com a primeira região
-)
-# Converte o nome amigável de volta para a chave interna
-chave_regiao_selecionada = [k for k, v in nomes_regioes.items() if v == regiao_selecionada_nome][0]
 
-# Botão para atualizar os dados
-if st.sidebar.button("Atualizar Dados"):
-    with st.spinner('Buscando dados mais recentes dos sensores...'):
-        # Simula um tempo de carregamento
-        time.sleep(2)
+regiao_selecionada = st.sidebar.selectbox(
+    "Selecione a Região:",
+    options=list(regioes.keys())
+)
+
+# Processamento inicial dos dados
+regiao_selecionada_key = regioes[regiao_selecionada]
+df_riscos = processar_dados_regiao(regiao_selecionada)
+
+# Filtro de Risco - Simplificado
+st.sidebar.markdown("---")
+niveis_risco = ["Muito Baixo", "Baixo", "Médio", "Alto"]
+# Usando session_state para gerenciar o estado dos filtros
+if 'niveis_selecionados' not in st.session_state:
+    st.session_state.niveis_selecionados = niveis_risco
+
+# Botões de Ação primeiro (antes do multiselect)
+col1, col2 = st.sidebar.columns(2)
+
+# Botão de Limpar Filtros
+if col1.button("Limpar Filtros"):
+    st.session_state.niveis_selecionados = []
+
+# Botão de Atualizar
+if col2.button("Atualizar Dados"):
+    with st.spinner('Atualizando dados...'):
+        time.sleep(1)
     st.sidebar.success("Dados atualizados!")
 
-
-# Processamento e exibição dos dados
-df_riscos = processar_dados_regiao(regiao_selecionada_nome)
-
-# Filtro por Nível de Risco na sidebar
-st.sidebar.markdown("---")
-niveis_disponiveis = sorted(df_riscos['Classificação'].unique())
+# Multiselect usando o session_state
 niveis_selecionados = st.sidebar.multiselect(
     "Filtrar por Nível de Risco:",
-    options=niveis_disponiveis,
-    default=niveis_disponiveis
+    options=niveis_risco,
+    default=st.session_state.niveis_selecionados
 )
 
-# Filtra o DataFrame com base nos níveis de risco selecionados
-df_filtrado = df_riscos[df_riscos['Classificação'].isin(niveis_selecionados)]
+# Atualiza o session_state com a nova seleção
+st.session_state.niveis_selecionados = niveis_selecionados
 
+# Filtragem dos dados
+if niveis_selecionados:
+    df_filtrado = df_riscos[df_riscos['Classificação'].isin(niveis_selecionados)]
+else:
+    df_filtrado = df_riscos
+
+
+# Adiciona informações sobre os filtros ativos
+st.sidebar.markdown("---")
+st.sidebar.markdown("### Filtros Ativos")
+st.sidebar.markdown(f"**Região:** {regiao_selecionada}")
+st.sidebar.markdown(f"**Níveis de Risco:** {', '.join(niveis_selecionados) if niveis_selecionados else 'Nenhum'}")
 
 # --- Layout Principal com Abas ---
 tab_mapa, tab_dados, tab_alertas = st.tabs(["🗺️ Mapa de Riscos", "📊 Dados Detalhados", "🚨 Alertas Críticos"])
 
 with tab_mapa:
-    st.header(f"Mapa de Riscos para: {regiao_selecionada_nome}")
+    st.header(f"Mapa de Riscos para: {regiao_selecionada}")
     if not df_filtrado.empty and df_filtrado[['Latitude', 'Longitude']].notna().all().all():
-        st.map(df_filtrado, latitude='Latitude', longitude='Longitude', size=100, color='#FF0000') # Cor vermelha para destaque
+        st.map(df_filtrado, latitude='Latitude', longitude='Longitude', size=100, color='#FF0000')
         st.caption("Pontos no mapa indicam as cidades monitoradas. A análise detalhada do risco está na aba 'Dados Detalhados'.")
     elif not df_filtrado.empty:
         st.warning("Algumas cidades não possuem coordenadas cadastradas e não serão exibidas no mapa.")
@@ -153,7 +170,7 @@ with tab_mapa:
         st.info("Nenhuma cidade corresponde aos filtros selecionados.")
         
 with tab_dados:
-    st.header(f"Análise Detalhada para: {regiao_selecionada_nome}")
+    st.header(f"Análise Detalhada para: {regiao_selecionada}")
     st.dataframe(df_filtrado, use_container_width=True)
 
 with tab_alertas:
@@ -173,5 +190,6 @@ with tab_alertas:
     else:
         st.success("Nenhum alerta de risco alto para a região e filtros selecionados.")
 
+# Footer
 st.sidebar.markdown("---")
 st.sidebar.info("Desenvolvido para o Hackathon CEFET-2025 - Desafio CBMMG.")
