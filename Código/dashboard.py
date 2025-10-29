@@ -1,5 +1,4 @@
 import streamlit as st
-import scipy
 import pandas as pd
 import time
 from aquisicaodedados import get_dados_sensores_por_regiao, MAPA_REGIAO_CIDADES
