@@ -1,5 +1,8 @@
+
 streamlit
 pandas
 numpy
 scikit-fuzzy
 networkx
+scipy 
+skfuzzy 
