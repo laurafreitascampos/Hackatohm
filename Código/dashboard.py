@@ -96,12 +96,12 @@ st.sidebar.header("Filtros de Visualização")
 
 # Seleção de Região - Simplificada
 regioes = {
-    "Região Central": "regiao_central",
-    "Triângulo Mineiro": "triangulo_mineiro", 
-    "Zona da Mata": "zona_da_mata",
-    "Norte de Minas": "norte_de_minas",
-    "Leste de Minas": "leste_de_minas",
-    "Sul de Minas": "sul_de_minas"
+    "Região Central - 1° COB": "regiao_central",
+    "Triângulo Mineiro - 2° COB": "triangulo_mineiro", 
+    "Zona da Mata - 3° COB": "zona_da_mata",
+    "Região Norte - 4° COB": "norte_de_minas",
+    "Região Leste - 5° COB": "leste_de_minas",
+    "Região Sul - 6° COB": "sul_de_minas"
 }
 
 regiao_selecionada = st.sidebar.selectbox(
